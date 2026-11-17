@@ -20,7 +20,7 @@ namespace StrikeZone.Gameplay
         }
 
         /// <summary>Launches the ball with power mapped from the minimum to maximum speed.</summary>
-        public void Launch(Vector3 direction, float power)
+        public void Launch(Vector3 direction, float power, float hook = 0f)
         {
             if (_body == null)
             {
@@ -36,6 +36,11 @@ namespace StrikeZone.Gameplay
             var speed = Mathf.Lerp(_minimumLaunchSpeed, _maximumLaunchSpeed, Mathf.Clamp01(power));
             _body.isKinematic = false;
             _body.linearVelocity = direction.normalized * speed;
+            // A small lateral impulse adds a controllable hook without overpowering pin physics.
+            _body.AddForce(Vector3.right * Mathf.Clamp(hook, -1f, 1f) * speed * 0.035f,
+                ForceMode.VelocityChange);
+            _body.AddTorque(Vector3.forward * -Mathf.Clamp(hook, -1f, 1f) * speed * 0.04f,
+                ForceMode.VelocityChange);
             _body.WakeUp();
         }
 
@@ -54,11 +59,11 @@ namespace StrikeZone.Gameplay
             }
 
             _body.isKinematic = true;
-            _body.linearVelocity = Vector3.zero;
-            _body.angularVelocity = Vector3.zero;
             transform.SetPositionAndRotation(spawnPoint.position, spawnPoint.rotation);
             Physics.SyncTransforms();
             _body.isKinematic = false;
+            _body.linearVelocity = Vector3.zero;
+            _body.angularVelocity = Vector3.zero;
             _body.Sleep();
         }
     }

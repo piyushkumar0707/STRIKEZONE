@@ -44,7 +44,7 @@ namespace StrikeZone.Editor
             var ballPinPhysics = GetOrCreatePhysicsMaterial(
                 "Assets/Materials/PhysicsMaterials/BallPin.physicMaterial", 0.3f, 0.2f);
 
-            var laneVisual = GetOrCreateMaterial("Assets/Materials/Lane.mat", new Color(0.12f, 0.22f, 0.32f));
+            var laneVisual = GetOrCreateMaterial("Assets/Materials/Lane.mat", new Color(0.43f, 0.24f, 0.11f));
             var gutterVisual = GetOrCreateMaterial("Assets/Materials/Gutter.mat", new Color(0.035f, 0.045f, 0.065f));
             var pinVisual = GetOrCreateMaterial("Assets/Materials/Pin.mat", new Color(0.92f, 0.92f, 0.86f));
             var ballVisual = GetOrCreateMaterial("Assets/Materials/Ball.mat", new Color(0.02f, 0.75f, 0.88f));

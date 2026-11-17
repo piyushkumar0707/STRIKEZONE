@@ -83,7 +83,8 @@ namespace StrikeZone.Editor
 
             Label(canvas.transform, "FrameInfo", "FRAME 1 / 10   ROLL 1", 29, new Vector2(0, 442), new Vector2(650, 54), TextAlignmentOptions.Center);
             Label(canvas.transform, "TotalScore", "TOTAL: 0", 34, new Vector2(-710, 440), new Vector2(300, 55), TextAlignmentOptions.Left);
-            Label(canvas.transform, "KeyHints", "A / D  AIM     SPACE  START POWER", 24, new Vector2(0, -465), new Vector2(1000, 48), TextAlignmentOptions.Center);
+            Label(canvas.transform, "KeyHints", "A / D  AIM     Q / E  HOOK     SPACE  START POWER", 24, new Vector2(0, -465), new Vector2(1200, 48), TextAlignmentOptions.Center);
+            Label(canvas.transform, "ChallengeProgress", "STRIKE CHALLENGE   0 / 3 STRIKES", 22, new Vector2(700, 440), new Vector2(480, 48), TextAlignmentOptions.Right);
             var track = Panel(canvas.transform, "PowerTrack", new Vector2(0, -395), new Vector2(660, 28), new Color(.08f, .15f, .23f, .95f));
             var fill = Panel(track.transform, "PowerFill", new Vector2(5, 0), new Vector2(650, 20), Cyan);
             var fillRect = fill.GetComponent<RectTransform>();
@@ -108,6 +109,7 @@ namespace StrikeZone.Editor
             // Attach references explicitly so the HUD does not depend on scene-wide searches.
             var so = new SerializedObject(manager);
             so.FindProperty("_scoreboard").objectReferenceValue = board.GetComponent<ScoreboardUI>();
+            so.FindProperty("_challengeProgress").objectReferenceValue = canvas.transform.Find("ChallengeProgress").GetComponent<TMP_Text>();
             so.FindProperty("_powerFill").objectReferenceValue = fillImage;
             so.FindProperty("_pausePanel").objectReferenceValue = pause;
             so.FindProperty("_gameOverPanel").objectReferenceValue = over;
@@ -127,12 +129,26 @@ namespace StrikeZone.Editor
             Panel(canvas.transform, "MenuBackground", Vector2.zero, new Vector2(1920, 1080), new Color(.018f, .04f, .075f));
             Label(canvas.transform, "Title", "STRIKE ZONE", 78, new Vector2(0, 275), new Vector2(1000, 120), TextAlignmentOptions.Center);
             Label(canvas.transform, "Tagline", "A precision bowling challenge", 28, new Vector2(0, 200), new Vector2(800, 50), TextAlignmentOptions.Center);
-            MakeButton(canvas.transform, "PlayButton", "PLAY", new Vector2(0, 105));
-            MakeButton(canvas.transform, "InstructionsButton", "HOW TO PLAY", new Vector2(0, 15));
-            MakeButton(canvas.transform, "SettingsButton", "SETTINGS", new Vector2(0, -75));
-            MakeButton(canvas.transform, "ExitButton", "EXIT", new Vector2(0, -165));
+            MakeButton(canvas.transform, "PlayButton", "CLASSIC GAME", new Vector2(0, 140));
+            MakeButton(canvas.transform, "ChallengeButton", "STRIKE CHALLENGE", new Vector2(0, 52));
+            MakeButton(canvas.transform, "TwoPlayerButton", "2 PLAYER LOCAL", new Vector2(0, -36));
+            MakeButton(canvas.transform, "RecordsButton", "LOCAL RECORDS", new Vector2(0, -124));
+            MakeButton(canvas.transform, "InstructionsButton", "HOW TO PLAY", new Vector2(0, -212));
+            MakeButton(canvas.transform, "SettingsButton", "SETTINGS", new Vector2(0, -300));
+            MakeButton(canvas.transform, "ExitButton", "EXIT", new Vector2(0, -388));
+            var records = Panel(canvas.transform, "RecordsPanel", Vector2.zero, new Vector2(760, 510), new Color(.025f, .055f, .105f, .98f));
+            records.AddComponent<Outline>().effectColor = new Color(.08f, .78f, .92f, .9f);
+            Label(records.transform, "RecordsTitle", "LOCAL RECORDS", 42, new Vector2(0, 185), new Vector2(680, 60), TextAlignmentOptions.Center);
+            Panel(records.transform, "ClassicRecordCard", new Vector2(0, 88), new Vector2(660, 58), new Color(.055f, .095f, .145f, 1));
+            Label(records.transform, "RecordsClassic", "CLASSIC HIGH SCORE    0 / 300", 27, new Vector2(0, 88), new Vector2(640, 52), TextAlignmentOptions.Center);
+            Panel(records.transform, "ChallengeRecordCard", new Vector2(0, 12), new Vector2(660, 58), new Color(.055f, .095f, .145f, 1));
+            Label(records.transform, "RecordsChallenge", "CHALLENGE HIGH SCORE    0 / 300", 27, new Vector2(0, 12), new Vector2(640, 52), TextAlignmentOptions.Center);
+            Panel(records.transform, "LocalMatchRecordCard", new Vector2(0, -64), new Vector2(660, 58), new Color(.055f, .095f, .145f, 1));
+            Label(records.transform, "RecordsMatches", "LOCAL MATCHES    P1 0  •  P2 0  •  DRAWS 0", 25, new Vector2(0, -64), new Vector2(640, 52), TextAlignmentOptions.Center);
+            MakeButton(records.transform, "CloseRecordsButton", "BACK TO MENU", new Vector2(0, -170));
+            records.SetActive(false);
             var instructions = Panel(canvas.transform, "InstructionsPanel", Vector2.zero, new Vector2(820, 430), Navy);
-            Label(instructions.transform, "InstructionsText", "A / D or LEFT / RIGHT  —  Aim\nSPACE  —  Start and lock the power meter\nESC  —  Pause\n\nTime your power release, knock down pins, and complete ten frames.", 27, Vector2.zero, new Vector2(740, 290), TextAlignmentOptions.Center);
+            Label(instructions.transform, "InstructionsText", "A / D or LEFT / RIGHT  —  Aim\nQ / E  —  Add left or right hook to your throw\nSPACE  —  Start the meter, then lock near 70% and throw\nESC  —  Pause\n\nStrike Challenge: earn 3 strikes in 10 frames.\n2 Player Local: alternate turns by frame; high score wins.", 27, Vector2.zero, new Vector2(740, 290), TextAlignmentOptions.Center);
             MakeButton(instructions.transform, "CloseInstructionsButton", "GOT IT", new Vector2(0, -165));
             instructions.SetActive(false);
             var settings = Panel(canvas.transform, "SettingsPanel", Vector2.zero, new Vector2(760, 380), Navy);
@@ -152,10 +168,11 @@ namespace StrikeZone.Editor
             Panel(canvas.transform, "ResultsBackground", Vector2.zero, new Vector2(1920, 1080), new Color(.018f, .04f, .075f));
             Label(canvas.transform, "ResultsTitle", "YOUR GAME", 56, new Vector2(0, 260), new Vector2(900, 80), TextAlignmentOptions.Center);
             Label(canvas.transform, "FinalScore", "FINAL SCORE\n0 / 300", 48, new Vector2(0, 170), new Vector2(800, 140), TextAlignmentOptions.Center);
-            Label(canvas.transform, "GameStats", "STRIKES   0     SPARES   0     OPENS   0     BEST FRAME   0", 25, new Vector2(0, 50), new Vector2(1200, 60), TextAlignmentOptions.Center);
-            BuildScoreboard(canvas.transform, "ResultsScoreboard", new Vector2(0, -120));
-            MakeButton(canvas.transform, "PlayAgainButton", "PLAY AGAIN", new Vector2(0, -335));
-            MakeButton(canvas.transform, "ResultsMenuButton", "MAIN MENU", new Vector2(0, -425));
+            Label(canvas.transform, "GameStats", "STRIKES 0   SPARES 0   OPENS 0   BEST FRAME 0", 21, new Vector2(0, 40), new Vector2(1400, 78), TextAlignmentOptions.Center);
+            BuildScoreboard(canvas.transform, "ResultsScoreboard", new Vector2(0, -100));
+            BuildScoreboard(canvas.transform, "ResultsScoreboardPlayer2", new Vector2(0, -255));
+            MakeButton(canvas.transform, "PlayAgainButton", "PLAY AGAIN", new Vector2(0, -380));
+            MakeButton(canvas.transform, "ResultsMenuButton", "MAIN MENU", new Vector2(0, -470));
             EditorSceneManager.SaveScene(scene, "Assets/Scenes/BowlingResults.unity");
         }
 

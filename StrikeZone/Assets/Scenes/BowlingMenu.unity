@@ -2952,7 +2952,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "A / D or LEFT / RIGHT  \u2014  Aim\nSPACE  \u2014  Start and lock the power meter\nESC  \u2014  Pause\n\nTime your power release, knock down pins, and complete ten frames."
+  m_text: "A / D or LEFT / RIGHT  \u2014  Aim\nQ / E  \u2014  Add left or right hook (hold while locking power)\nSPACE  \u2014  Start the meter, then lock power and throw\nESC  \u2014  Pause\n\nRead the lane, shape your shot, and complete all ten frames."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

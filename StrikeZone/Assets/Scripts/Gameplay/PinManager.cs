@@ -27,6 +27,7 @@ namespace StrikeZone.Gameplay
         private int _standingBeforeRoll;
         private bool _rollActive;
         private bool _ballEnteredPit;
+        private bool _quickResolveRequested;
 
         public event Action<int> OnRollResolved;
 
@@ -75,7 +76,16 @@ namespace StrikeZone.Gameplay
 
             _standingBeforeRoll = StandingPinCount;
             _ballEnteredPit = false;
+            _quickResolveRequested = false;
             _rollActive = true;
+        }
+
+        /// <summary>Skips the pin-settle wait after the ball leaves play or stops.</summary>
+        public bool RequestQuickResolve()
+        {
+            if (!_rollActive) return false;
+            _quickResolveRequested = true;
+            return true;
         }
 
         /// <summary>
@@ -115,7 +125,7 @@ namespace StrikeZone.Gameplay
 
             var pinsSettledFor = 0f;
             var pinWaitElapsed = 0f;
-            while (pinsSettledFor < _settleDuration && pinWaitElapsed < _pinSettleTimeout)
+            while (!_quickResolveRequested && pinsSettledFor < _settleDuration && pinWaitElapsed < _pinSettleTimeout)
             {
                 var deltaTime = Time.deltaTime;
                 pinWaitElapsed += deltaTime;

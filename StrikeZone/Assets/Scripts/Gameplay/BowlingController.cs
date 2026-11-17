@@ -17,16 +17,19 @@ namespace StrikeZone.Gameplay
 
         private InputActionMap _actionMap;
         private InputAction _aimAction;
+        private InputAction _hookAction;
         private InputAction _confirmAction;
         private InputAction _pauseAction;
         private bool _inputEnabled = true;
         private bool _releasePending;
 
         public event Action OnBallReleased;
+        public event Action OnQuickReturnRequested;
         public event Action OnPauseRequested;
         public event Action OnPowerMeterStarted;
         public event Action<float> OnPowerLocked;
         public bool IsInputEnabled => _inputEnabled;
+        public float AimCentering => _aimController != null ? _aimController.Centering : 1f;
 
         private void Awake()
         {
@@ -38,6 +41,7 @@ namespace StrikeZone.Gameplay
 
             _actionMap = _inputActionsAsset.FindActionMap("Bowling", true);
             _aimAction = _actionMap.FindAction("Aim", true);
+            _hookAction = _actionMap.FindAction("Hook", true);
             _confirmAction = _actionMap.FindAction("Confirm", true);
             _pauseAction = _actionMap.FindAction("Pause", true);
 
@@ -62,6 +66,12 @@ namespace StrikeZone.Gameplay
             if (_pauseAction != null && _pauseAction.WasPressedThisFrame())
             {
                 OnPauseRequested?.Invoke();
+            }
+
+            if (_confirmAction != null && _confirmAction.WasPressedThisFrame() && !_inputEnabled && !_releasePending)
+            {
+                OnQuickReturnRequested?.Invoke();
+                return;
             }
 
             if (!_inputEnabled || _releasePending || _aimAction == null || _confirmAction == null)
@@ -92,10 +102,11 @@ namespace StrikeZone.Gameplay
             }
 
             var lockedPower = _powerMeter.LockPower();
+            var lockedHook = _hookAction != null ? _hookAction.ReadValue<float>() : 0f;
             OnPowerLocked?.Invoke(lockedPower);
             _inputEnabled = false;
             _releasePending = true;
-            StartCoroutine(ReleaseAfterDelay(lockedPower));
+            StartCoroutine(ReleaseAfterDelay(lockedPower, lockedHook));
         }
 
         /// <summary>Enables or disables aiming and throw controls; pause remains available.</summary>
@@ -118,7 +129,7 @@ namespace StrikeZone.Gameplay
             _inputEnabled = true;
         }
 
-        private IEnumerator ReleaseAfterDelay(float power)
+        private IEnumerator ReleaseAfterDelay(float power, float hook)
         {
             yield return new WaitForSecondsRealtime(_releaseDelay);
 
@@ -129,7 +140,7 @@ namespace StrikeZone.Gameplay
 
             if (_ball != null && _aimController != null)
             {
-                _ball.Launch(_aimController.Direction, power);
+                _ball.Launch(_aimController.Direction, power, hook);
                 OnBallReleased?.Invoke();
             }
 

@@ -13,17 +13,31 @@ The Build Settings scene order is `BowlingMenu`, `BowlingGame`, `BowlingResults`
 ## Controls
 
 - **A / D** or **Left / Right**: aim
-- **Space**: start the power meter; press again to lock power and throw
+- **Q / E**: add left or right hook to the next throw (hold while locking power)
+- **Space**: start the power meter; press again near **70%** to lock power and throw
+- **Space during a roll**: quick-return the ball after it reaches the pit or stops, skipping the remaining pin-settle wait
 - **Esc**: pause or resume
 - Use the mouse to click menu and pause buttons.
+
+## Modes and feedback
+
+- **Classic Game**: play a standard ten-frame game.
+- **Strike Challenge**: earn at least three strikes in ten frames; progress stays visible in the gameplay HUD and the result screen reports whether you met the target.
+- **2 Player Local**: players alternate after each frame on the same lane, keep separate ten-frame scorecards, and see the winner at the end.
+- Every roll receives an **S / A / B / C shot rank** based on pins knocked down, power timing, and aim centering. The best rank is shown in the results.
+- Results save local records between launches: Classic and Challenge high scores, plus Player 1 / Player 2 wins and draws.
 
 ## Included systems
 
 - Pure C# frame progression and ten-pin score calculation in `Assets/Scripts/Logic`.
 - Rigidbody lane, ball, pins, gutter, pit, and once-per-roll pin counting.
+- Skill-based shot shaping: aim angle, a timing-based power meter, and a lateral hook impulse.
+- Ten-frame strike challenge with live objective tracking and end-of-game success feedback.
+- Per-roll skill rating based on pin conversion, power release, and aim centering.
 - Contextual HUD with ten-frame scoreboard, power meter, pause/game-over overlays, and strike/spare/gutter banners.
 - Menu, instructions, master-volume settings, and results with score, strike/spare/open counts, best frame, and read-only scoreboard.
-- Smooth ball/deck camera framing and event-driven audio feedback. Short synthesized placeholder sounds play until optional audio clips are assigned in the Inspector.
+- A main-menu local records panel for saved Classic / Challenge highs and 2-player wins / draws.
+- Smooth ball/deck camera framing, animated shot-rank banners, strike / spare camera feedback, and layered synthesized bowling sounds. Optional Inspector audio clips can replace the generated cues.
 
 ## Editor tools
 

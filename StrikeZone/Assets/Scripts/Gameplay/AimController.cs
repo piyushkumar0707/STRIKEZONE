@@ -13,6 +13,7 @@ namespace StrikeZone.Gameplay
         private float _aimAngleDegrees;
 
         public float AimAngleDegrees => _aimAngleDegrees;
+        public float Centering => 1f - Mathf.Clamp01(Mathf.Abs(_aimAngleDegrees) / _maximumAngleDegrees);
         public Vector3 Direction => (Quaternion.AngleAxis(_aimAngleDegrees, Vector3.up) * Vector3.forward).normalized;
 
         private void Awake()

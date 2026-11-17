@@ -15,6 +15,9 @@ namespace StrikeZone.Gameplay
         private Vector3 _startPosition;
         private Quaternion _startRotation;
         private Vector3 _positionVelocity;
+        private float _shakeRemaining;
+        private float _shakeDuration;
+        private float _shakeStrength;
 
         private void Awake()
         {
@@ -27,6 +30,16 @@ namespace StrikeZone.Gameplay
             if (_gameManager == null) _gameManager = FindAnyObjectByType<BowlingGameManager>();
             _startPosition = transform.position;
             _startRotation = transform.rotation;
+        }
+
+        private void OnEnable()
+        {
+            if (_gameManager != null) _gameManager.OnRollResolved += HandleRollResolved;
+        }
+
+        private void OnDisable()
+        {
+            if (_gameManager != null) _gameManager.OnRollResolved -= HandleRollResolved;
         }
 
         private void LateUpdate()
@@ -59,13 +72,35 @@ namespace StrikeZone.Gameplay
             }
 
             transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref _positionVelocity, _smoothTime);
+            if (_shakeRemaining > 0f)
+            {
+                _shakeRemaining = Mathf.Max(0f, _shakeRemaining - Time.deltaTime);
+                var shakeEnvelope = _shakeDuration > 0f ? _shakeRemaining / _shakeDuration : 0f;
+                transform.position += Random.insideUnitSphere * (_shakeStrength * shakeEnvelope);
+            }
             var targetRotation = Quaternion.LookRotation(lookAt - transform.position, Vector3.up);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 1f - Mathf.Exp(-5f * Time.deltaTime));
+        }
+
+        private void HandleRollResolved(int frame, int roll, int pins, StrikeZone.Logic.ScoreSnapshot snapshot)
+        {
+            if (pins == 10 && _gameManager != null && _gameManager.PinsStandingBeforeLastRoll == 10)
+                StartShake(.16f, .3f);
+            else if (pins > 0)
+                StartShake(.07f, .18f);
+        }
+
+        private void StartShake(float strength, float duration)
+        {
+            _shakeStrength = strength;
+            _shakeDuration = duration;
+            _shakeRemaining = duration;
         }
 
         public void ResetCamera()
         {
             _positionVelocity = Vector3.zero;
+            _shakeRemaining = 0f;
             transform.SetPositionAndRotation(_startPosition, _startRotation);
         }
     }

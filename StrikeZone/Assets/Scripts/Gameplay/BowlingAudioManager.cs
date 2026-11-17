@@ -27,10 +27,10 @@ namespace StrikeZone.Gameplay
             _pins = FindObjectsByType<BowlingPin>(FindObjectsInactive.Include);
 
             if (_powerLockClip == null) _powerLockClip = MakeTone("GeneratedPowerLock", .08f, 1050f, 640f, 10f);
-            if (_ballReleaseClip == null) _ballReleaseClip = MakeTone("GeneratedBallRelease", .28f, 290f, 95f, 4f);
-            if (_pinHitClip == null) _pinHitClip = MakeTone("GeneratedPinHit", .16f, 760f, 170f, 15f);
-            if (_strikeClip == null) _strikeClip = MakeTone("GeneratedStrike", .55f, 460f, 980f, 2.5f);
-            if (_spareClip == null) _spareClip = MakeTone("GeneratedSpare", .4f, 560f, 820f, 3f);
+            if (_ballReleaseClip == null) _ballReleaseClip = MakeWhoosh("GeneratedBallRelease", .3f);
+            if (_pinHitClip == null) _pinHitClip = MakeImpact("GeneratedPinHit", .17f);
+            if (_strikeClip == null) _strikeClip = MakeStinger("GeneratedStrike", true);
+            if (_spareClip == null) _spareClip = MakeStinger("GeneratedSpare", false);
         }
 
         private void OnEnable()
@@ -99,6 +99,71 @@ namespace StrikeZone.Gameplay
             }
 
             var clip = AudioClip.Create(name, sampleCount, 1, sampleRate, false);
+            clip.SetData(samples, 0);
+            return clip;
+        }
+
+        private static AudioClip MakeImpact(string name, float duration)
+        {
+            const int sampleRate = 22050;
+            var sampleCount = Mathf.CeilToInt(duration * sampleRate);
+            var samples = new float[sampleCount];
+            for (var i = 0; i < sampleCount; i++)
+            {
+                var t = i / (float)sampleRate;
+                var envelope = Mathf.Exp(-27f * t);
+                var low = Mathf.Sin(2f * Mathf.PI * Mathf.Lerp(230f, 105f, t / duration) * t);
+                var clack = Mathf.Sin(2f * Mathf.PI * 940f * t) * Mathf.Exp(-45f * t);
+                var noise = (Mathf.PerlinNoise(i * .071f, .37f) * 2f - 1f) * Mathf.Exp(-38f * t);
+                samples[i] = (low * .52f + clack * .2f + noise * .28f) * envelope * .42f;
+            }
+
+            return CreateClip(name, samples, sampleRate);
+        }
+
+        private static AudioClip MakeWhoosh(string name, float duration)
+        {
+            const int sampleRate = 22050;
+            var sampleCount = Mathf.CeilToInt(duration * sampleRate);
+            var samples = new float[sampleCount];
+            for (var i = 0; i < sampleCount; i++)
+            {
+                var t = i / (float)sampleRate;
+                var phase = Mathf.Clamp01(t / duration);
+                var envelope = Mathf.Sin(Mathf.PI * phase) * Mathf.Exp(-2.3f * phase);
+                var rumble = Mathf.Sin(2f * Mathf.PI * Mathf.Lerp(175f, 62f, phase) * t);
+                var air = Mathf.PerlinNoise(i * .034f, .71f) * 2f - 1f;
+                samples[i] = (rumble * .56f + air * .22f) * envelope * .32f;
+            }
+
+            return CreateClip(name, samples, sampleRate);
+        }
+
+        private static AudioClip MakeStinger(string name, bool strike)
+        {
+            const int sampleRate = 22050;
+            var duration = strike ? .78f : .52f;
+            var notes = strike ? new[] { 587f, 740f, 880f, 1175f } : new[] { 494f, 659f, 784f };
+            var step = duration / notes.Length;
+            var sampleCount = Mathf.CeilToInt(duration * sampleRate);
+            var samples = new float[sampleCount];
+            for (var i = 0; i < sampleCount; i++)
+            {
+                var t = i / (float)sampleRate;
+                var noteIndex = Mathf.Min(notes.Length - 1, Mathf.FloorToInt(t / step));
+                var noteTime = t - noteIndex * step;
+                var envelope = Mathf.Sin(Mathf.PI * Mathf.Clamp01(noteTime / step)) * Mathf.Exp(-2.4f * noteTime);
+                var fundamental = Mathf.Sin(2f * Mathf.PI * notes[noteIndex] * noteTime);
+                var harmonic = Mathf.Sin(2f * Mathf.PI * notes[noteIndex] * 2f * noteTime) * .22f;
+                samples[i] = (fundamental * .72f + harmonic) * envelope * .26f;
+            }
+
+            return CreateClip(name, samples, sampleRate);
+        }
+
+        private static AudioClip CreateClip(string name, float[] samples, int sampleRate)
+        {
+            var clip = AudioClip.Create(name, samples.Length, 1, sampleRate, false);
             clip.SetData(samples, 0);
             return clip;
         }

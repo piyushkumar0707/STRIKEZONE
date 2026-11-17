@@ -67,13 +67,13 @@ namespace StrikeZone.Gameplay
 
             gameObject.SetActive(true);
             _body.isKinematic = true;
-            _body.linearVelocity = Vector3.zero;
-            _body.angularVelocity = Vector3.zero;
             transform.SetPositionAndRotation(position, rotation);
             _enteredPit = false;
             IsKnockedDown = false;
             Physics.SyncTransforms();
             _body.isKinematic = false;
+            _body.linearVelocity = Vector3.zero;
+            _body.angularVelocity = Vector3.zero;
             _body.Sleep();
         }
 
