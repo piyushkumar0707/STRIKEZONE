@@ -1,0 +1,105 @@
+{
+    "name": "StrikeZoneControls",
+    "maps": [
+        {
+            "name": "Bowling",
+            "id": "8c74482f-2d27-4fc3-ae94-5fc87e55f026",
+            "actions": [
+                {
+                    "name": "Aim",
+                    "type": "Value",
+                    "id": "d17a2f77-12d6-4e53-8b41-6f0d6a2e9b08",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Confirm",
+                    "type": "Button",
+                    "id": "8cbed917-a856-44c1-b2a1-4a3f1d49c909",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Pause",
+                    "type": "Button",
+                    "id": "8e2a90a9-5c17-42e0-9ec5-3aa17ef98271",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "A/D",
+                    "id": "a1111111-1111-4111-8111-111111111111",
+                    "path": "1DAxis",
+                    "action": "Aim",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "a2222222-2222-4222-8222-222222222222",
+                    "path": "<Keyboard>/a",
+                    "action": "Aim",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "a3333333-3333-4333-8333-333333333333",
+                    "path": "<Keyboard>/d",
+                    "action": "Aim",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "Arrow keys",
+                    "id": "a4444444-4444-4444-8444-444444444444",
+                    "path": "1DAxis",
+                    "action": "Aim",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "a5555555-5555-4555-8555-555555555555",
+                    "path": "<Keyboard>/leftArrow",
+                    "action": "Aim",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "a6666666-6666-4666-8666-666666666666",
+                    "path": "<Keyboard>/rightArrow",
+                    "action": "Aim",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "b1111111-1111-4111-8111-111111111111",
+                    "path": "<Keyboard>/space",
+                    "action": "Confirm",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b2222222-2222-4222-8222-222222222222",
+                    "path": "<Keyboard>/escape",
+                    "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
